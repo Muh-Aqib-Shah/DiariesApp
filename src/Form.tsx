@@ -3,6 +3,14 @@ import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as Yup from 'yup';
 import "./App.css"
+import Request from "./RequestHandler";
+import { useSelector } from "react-redux";
+import { useAppDispatch } from "./appState/store";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { setUser } from "./appState/UserSlice";
+import { updateEntry } from "./appState/EntrySlice";
+import { Entry } from "./interfaces/entry.interface";
 
 export const Form = () => {
    
@@ -10,23 +18,28 @@ const schema = Yup.object().shape({
     username: Yup.string().required("Enter a valid username!").max(16,"maximum characters are 16"),
     password: Yup.string().required("Enter a valid password").min(8,"password must contain atleast 8 characters"),
     email: Yup.string().email("Enter a email like abc@x.yz.com")
-    
 });
+  const dispatch = useAppDispatch();
+  let navigator = useNavigate();
 
-
-let {handleSubmit,register,setError,formState: {errors,isSubmitting}} =  useForm({
+let {handleSubmit,register,formState: {errors,isSubmitting}} =  useForm({
   resolver: yupResolver(schema)
 })
 const [isLogin,setIsLogin] = useState(true)
-const [loading,setLoading] = useState(false)
 
 const submitForm = async (data: any) =>{
-    const endpoint = isLogin ? "auth/login" : "auth/signup";
-    fetch("fakeapi/auth/login",{
-      method: "POST",
-        body: data
-    }).then(dat => console.log("GETTING HERE",dat))
-
+    
+    Request.post(
+    `fakeapi/auth/${isLogin ? "login" : "signup" }`,data)
+    .then(dat => {
+        if (dat) {
+          const { user, token } = dat;
+          dispatch(setUser(user));
+          setTimeout(()=> navigator("/diaries"),2000)
+           }
+        }).catch((error) => {
+        console.log(error);
+      })
 }
 
 return (

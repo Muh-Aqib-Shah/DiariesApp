@@ -1,7 +1,6 @@
 import { Provider } from 'react-redux';
 import './App.css';
-import store from "./app/store"
-import { Diary } from './Diary/Dairy';
+import store from "./appState/store"
 import { LoginForm } from './Login';
 
 function App() {

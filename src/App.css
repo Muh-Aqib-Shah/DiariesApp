@@ -145,3 +145,145 @@ button:hover, button:focus {
     opacity: 0.8;
   }
 }
+.cont{
+  height: 100vh;
+  width : 100vw;
+  background-color: whitesmoke;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+.list{
+  background-color: #778899;
+  height : 100%;
+  overflow-y: auto;
+  padding-top: 10px;
+  flex-basis: 25%
+}
+
+.crt-new-btndiv{
+  width: 90%;
+  height: 40px;
+  margin: 40px 0;
+  position: -webkit-sticky; 
+  position: sticky;
+  top: 20px; 
+  z-index: 2;
+}
+
+.crt-new-btn{
+  background-color: palevioletred;
+  width: 100%;
+  height: 100%
+}
+.list-item{
+  text-align: left;
+  height: auto;
+  width: 80%;
+  border: 3px solid black;
+  border-radius: 10px 10px 10px 10px;
+  margin: 15px 0;
+  background-color: silver;
+  box-shadow: 3px 3px 10px black
+}
+.iconBox{
+  display: inline-block;
+  height: 100%;
+  width: 25%;
+}
+.detailBox{
+  display: inline-block;
+  height: 80%;
+  width: 75%;
+}
+.list-item-title{
+  height: 75%
+}
+.list-item-date{
+  height: 25%;
+  border-top: 1px solid black;
+  font-size: xx-small;
+  display: flex;
+  justify-content: flex-end;
+}
+.list-btn{
+  display: inline-block;
+  width: 50%;
+  height: 10px;
+  font-size: xx-small;
+}
+
+#add{
+  background-color: white;
+  color: grey;
+}
+#view{
+  background-color: grey;
+  color: white;
+}
+.entry{
+  flex-basis: 75%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40%;
+  height: 100%;
+  background-image: url("./images/diary-background2.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.entry-box{
+  height: 80%;
+  width: 65%;
+  position: relative
+}
+.contents{
+  margin-top: 100px;
+}
+
+.entry-li{
+  font-size: larger;
+  border-bottom: 1px dashed black;
+  margin: 20px 0;
+  font-family: monospace; 
+  position: relative;
+}
+
+.del-entry{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: brown;
+  width: 2px;
+  height: 2px;
+  opacity: 0;
+  font-size: xx-small;
+}
+.entry-li .del-entry{
+  position: absolute;
+  right: 0;
+  top: 0; 
+}
+.entry-li:hover .del-entry{
+  opacity: 1;
+  transition: opacity 0.5s
+
+}
+.addEntry{
+  width: 100%;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.addEntrybtn{
+  width: 200px;
+}
+.entry-box .addEntry{
+  position: absolute;
+  bottom: 0;
+}
+.entry .entry-input{
+  position: absolute;
+  bottom: 0;
+}
