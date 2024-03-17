@@ -7,6 +7,7 @@ import rootState from "./appState/rootState";
 import Request from "./RequestHandler";
 import Swal from 'sweetalert2';
 import { addDiary } from "./appState/DiarySlice";
+import { getAllDiaries } from "./appState/DiarySlice";
 import { Diary } from "./interfaces/diary.interface";
 
 let glob = true;
@@ -20,11 +21,13 @@ export const Home = () => {
     let [state,setState] = useState(false);
     let mystate = useSelector((state: rootState)=> state.diary.diaries)
     let user = useSelector((state: rootState) => state.user)
-   console.log("Diaries: ",mystate)
+   console.log("my state diaries: ",mystate)
     const dispatch = useAppDispatch();
-    const createDiary = () => {
+    const requestDiary = () => {
+         dispatch(getAllDiaries());
+        /*
         Request.get(
-             'fakeapi/diaries/')
+             'fakeapi/diaries')
              .then(dat => {
             if(dat){
             console.log("DONW WITH CREATING: ",dat);
@@ -33,12 +36,12 @@ export const Home = () => {
             }
         })
         //Swal.fire({titleText: 'All done!',confirmButtonText: 'OK!',}))
-        .catch(dat =>  Swal.fire({ titleText: 'Cancelled', }))
+        .catch(dat =>  Swal.fire({ titleText: 'Cancelled', }))*/
       }
     
     
     if(true && glob){
-        createDiary(); 
+        requestDiary(); 
         glob = false;
     }
     const myRef = useRef<string | null>("");

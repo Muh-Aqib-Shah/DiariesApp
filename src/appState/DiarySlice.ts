@@ -4,10 +4,12 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Diary } from"../interfaces/diary.interface";
 
 
-const getAllDiaries = createAsyncThunk(
+export const getAllDiaries = createAsyncThunk(
    "DiarySlice/getAllDiaries",
    async (args,thunkAPI) => {
     const response = await fetch('fakeapi/diaries/');
+    console.log("Waiting on server");
+    
     return response.json();  
 })
 
@@ -44,9 +46,12 @@ const diary = createSlice({
     extraReducers(builder) {
       builder
       .addCase(getAllDiaries.pending, (state) => {
+        console.log("Failed");
+        
         state.isLoading = true
       })
       .addCase(getAllDiaries.fulfilled, (state, {payload}: PayloadAction<Diary[]>) => {
+        console.log("Completed");
         state.error = false
         state.diaries = payload
         state.isLoading = false
@@ -57,5 +62,5 @@ const diary = createSlice({
   }
 })
 
-export const {addDiary} = diary.actions;
+export const {addDiary,} = diary.actions;
 export default diary.reducer

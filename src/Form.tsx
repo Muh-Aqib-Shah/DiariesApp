@@ -37,9 +37,7 @@ const submitForm = async (data: any) =>{
           dispatch(setUser(user));
           setTimeout(()=> navigator("/diaries"),2000)
            }
-        }).catch((error) => {
-        console.log(error);
-      })
+        }).catch((error) => {  console.log(error)  })
 }
 
 return (
