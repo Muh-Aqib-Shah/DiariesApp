@@ -15,7 +15,7 @@ const post = async (api : string,data: any) => {
     })).json()
     return mydata;
 }
-const put = async (api : string,param: number,data: any) => {
+const put = async (api : string,param: string | undefined,data: any) => {
       
     let mydata = await (await fetch(`/fakeapi/${api}/${param}`,{
         method: "PUT",
@@ -27,5 +27,14 @@ const put = async (api : string,param: number,data: any) => {
     return mydata;
     
 }
-
-export default {get,post,put}
+const Delete = async (api : string,param: string | undefined) => {
+      
+    let mydata = await (await fetch(`/fakeapi/${api}/${param}`,{
+        method: "DELETE",
+        headers: {
+            'Content-Type' : "application/json"
+        }})).json()
+    return mydata;
+}
+const funcs = {get,post,put,Delete}
+export default funcs;

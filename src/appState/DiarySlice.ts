@@ -3,52 +3,44 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { Diary } from"../interfaces/diary.interface";
 
-
-const getAllDiaries = createAsyncThunk(
-   "DiarySlice/getAllDiaries",
-   async (args,thunkAPI) => {
-    const response = await fetch('fakeapi/diaries/');
-    return response.json();  
-})
+export const getAllDiaries = createAsyncThunk(
+   `DiarySlice/getAllDiaries`,
+   async (args,thunkAPI) => { 
+    const userID = (thunkAPI.getState() as { user: { id: string | null } })?.user?.id;
+    const response = await fetch(`fakeapi/diaries/${userID}`);
+    return response.json(); 
+    })
 
 type initialState = {
-  diaries: Diary[],
+  diaries: Diary[] | null,
   isLoading: boolean;
   error: boolean;
+  activeDiaryID: number | null
 }
 
 const firstState: initialState = {
   diaries: [] as Diary[],
   isLoading: false,
-  error: false
+  error: false,
+  activeDiaryID: null
 }
 const diary = createSlice({
     name: "DiarySlice",
     initialState: firstState,
     reducers: {
-        addDiary: (state,{payload}: PayloadAction<Diary[] | []>) => {
-            console.log("received ",JSON.stringify(state)," and ",payload)
-            const diariesToSave = payload.filter((diary) => {
-                return diary == null//state.findIndex((item) => item.id === diary.id) === -1;
-              });
-        },
-        updateDiary(state, { payload }: PayloadAction<Diary>) {
-            const { id } = payload;
-            const diaryIndex : number = 199 //state.findIndex((diary) => diary.id === id);
-            if (diaryIndex !== -1) {
-              //state.splice(diaryIndex, 1, payload);
-            }
-          }
+         activeDiaryId: (state,{payload}: PayloadAction<string | null>) => {
+          state.activeDiaryID = Number(payload);
+         }
 
     },
     extraReducers(builder) {
       builder
-      .addCase(getAllDiaries.pending, (state) => {
+      .addCase(getAllDiaries.pending, (state) => {        
         state.isLoading = true
       })
-      .addCase(getAllDiaries.fulfilled, (state, {payload}: PayloadAction<Diary[]>) => {
+      .addCase(getAllDiaries.fulfilled, (state, {payload}: PayloadAction<{diaries: Diary[]} | null>) => {
         state.error = false
-        state.diaries = payload
+        state.diaries = payload?.diaries ?? null
         state.isLoading = false
       })
       .addCase(getAllDiaries.rejected, (state, action) => {
@@ -57,5 +49,5 @@ const diary = createSlice({
   }
 })
 
-export const {addDiary} = diary.actions;
+export const {activeDiaryId} = diary.actions;
 export default diary.reducer

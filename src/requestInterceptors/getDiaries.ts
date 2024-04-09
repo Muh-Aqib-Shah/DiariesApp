@@ -1,20 +1,14 @@
-import { Response, Request } from 'miragejs';
-import { handleErrors } from '../Server';
+import { Request } from 'miragejs';
 import { Diary } from '../interfaces/diary.interface';
 
-const getDiaries = (schema: any,req: Request) : Diary | Response=> {
-    console.log("DIARY METHODS: ",schema.diaries)
-    return [] as Diary[];
+const getDiaries = (schema: any,req: Request) : Diary[] | null => {
     try{
-        let user = schema.users.find(req.params.id);
-        console.log("DIARY TO RETRIVE FROM: ",user);
-        
-        return user.diary as Diary
+        let user = schema.users.find(req.params.id);        
+        return user.diary as Diary[]
     }
-    catch(err){
-        return handleErrors(err,"Could not get diaries");
+    catch(err){        
+        return null;
     }
-
 }
 
 export default getDiaries;

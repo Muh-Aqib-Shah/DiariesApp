@@ -2,15 +2,12 @@ import { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as Yup from 'yup';
-import "./App.css"
 import Request from "./RequestHandler";
-import { useSelector } from "react-redux";
 import { useAppDispatch } from "./appState/store";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "./appState/UserSlice";
-import { updateEntry } from "./appState/EntrySlice";
-import { Entry } from "./interfaces/entry.interface";
+import { FormStyles } from "./styles/customLogin";
+import { saveToken, setAuthState } from "./appState/AuthSlice";
 
 export const Form = () => {
    
@@ -29,20 +26,19 @@ const [isLogin,setIsLogin] = useState(true)
 
 const submitForm = async (data: any) =>{
     
-    Request.post(
-    `fakeapi/auth/${isLogin ? "login" : "signup" }`,data)
-    .then(dat => {
-        if (dat) {
-          const { user, token } = dat;
+    Request.post(`fakeapi/auth/${isLogin ? "login" : "signup" }`,data)
+    .then(({user,token}) => {
+        if (token) {
           dispatch(setUser(user));
-          setTimeout(()=> navigator("/diaries"),2000)
-           }
-        }).catch((error) => {
-        console.log(error);
-      })
+          dispatch(saveToken(token))
+          dispatch(setAuthState(true))
+          setTimeout(()=> navigator("/diaries"),500)
+        }
+    }).catch((error) => {  console.log(error)  })
 }
 
 return (
+  <FormStyles>
     <div className="auth">
       <div className="card">
         <form onSubmit={handleSubmit(submitForm)}>
@@ -91,5 +87,6 @@ return (
         </form>
       </div>
     </div>
+  </FormStyles>
   );
 };

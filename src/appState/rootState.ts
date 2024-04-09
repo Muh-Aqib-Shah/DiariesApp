@@ -12,8 +12,15 @@ type rootState = {
         diaries: Diary[],
         isLoading: boolean;
         error: boolean;
+        activeDiaryID: number 
       };
-      entries: Entry[];
+      entry: {
+        entries: Entry[],
+        isLoading: boolean;
+        error: boolean;
+        activeEntryID: number
+
+      };
       user: User | null;
 }
 export default rootState;

@@ -14,19 +14,16 @@ export interface AuthResponse {
 
 const login = (schema: any,req: Request) : AuthResponse | Response => {
     const {username,password} = JSON.parse(req.requestBody);
-    console.log("Getting schema: ",schema," and req: ",req);
     
     const user = schema.users.findBy({username});
-    console.log("Found: ",user)
     if(!user){
         showAlert("No user with that name exists","error")
         return handleErrors(null,"No user with that username exists");
     }
-    else if(password != user.password){
+    else if(password !== user.password){
         showAlert("Incorrect Password","error")
         return handleErrors(null,"Password is incorrect")
     }
-    console.log("Reached Here");
     const token = generateToken();
     return {
     user: user.attrs as User,

@@ -1,132 +1,135 @@
-import { FormEvent, useRef, useState } from "react";
-import "./App.css"
-import MenuBookIcon from '@mui/icons-material/MenuBook';
+import { useEffect , useState } from "react";
+import QueueOutlinedIcon from '@mui/icons-material/QueueOutlined';
+import FeedbackTwoToneIcon from '@mui/icons-material/FeedbackTwoTone';
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "./appState/store";
 import rootState from "./appState/rootState";
 import Request from "./RequestHandler";
-import Swal from 'sweetalert2';
-import { addDiary } from "./appState/DiarySlice";
+import { getAllDiaries } from "./appState/DiarySlice";
+import { activeEntryId, getAllEntries } from "./appState/EntrySlice";
 import { Diary } from "./interfaces/diary.interface";
-
-let glob = true;
+import { activeDiaryId } from "./appState/DiarySlice";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { CustomModal } from "./CustomModal";
+import { DiaryCard } from "./DiaryCard";
+import { EntryCard } from "./EntryCard";
+import { HomeStyles } from "./styles/customHome";
+import { useNavigate } from "react-router-dom";
+import { setAuthState } from "./appState/AuthSlice";
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 
 export const Home = () => { 
+
+    var AllDiaries = useSelector((state: rootState)=> state.diary.diaries)
+    const AllEntries = useSelector((state: rootState)=> state.entry.entries)
+    var activeDiaryID = useSelector((state: rootState)=> state.diary.activeDiaryID)
+    var activeEntryID = useSelector((state: rootState) => state.entry.activeEntryID)
+    var user = useSelector((state: rootState) => state.user)
+    var isAuthenticated = useSelector((state: rootState) => state.auth.isAuthenticated)
     
-    type itemsss = {
-        name : string,
-        date: Date
-    }
-    let [state,setState] = useState(false);
-    let mystate = useSelector((state: rootState)=> state.diary.diaries)
-    let user = useSelector((state: rootState) => state.user)
-   console.log("Diaries: ",mystate)
     const dispatch = useAppDispatch();
-    const createDiary = () => {
-        Request.get(
-             'fakeapi/diaries/')
-             .then(dat => {
-            if(dat){
-            console.log("DONW WITH CREATING: ",dat);
-            
-            setState(true);
-            }
-        })
-        //Swal.fire({titleText: 'All done!',confirmButtonText: 'OK!',}))
-        .catch(dat =>  Swal.fire({ titleText: 'Cancelled', }))
-      }
+    const navigate = useNavigate();
+
+    const [Diaries,setDiaries] = useState<Diary[]>()
+    const [canEditDiary,setCanEditDiary] = useState(false);
+    const [addEntry,setEntry] = useState(false);
+    const [updateDiary,setupdateDiary] = useState(false)
+    const [updateEntry,setupdateEntry] = useState(false);
+    const [logout,setLogout] = useState(false);
     
+    useEffect(()=>{
+        if(!isAuthenticated)
+            navigate("/")
+    },[isAuthenticated,navigate])
+
+    useEffect(()=>{
+        setDiaries(AllDiaries);
+    },[AllDiaries])
     
-    if(true && glob){
-        createDiary(); 
-        glob = false;
-    }
-    const myRef = useRef<string | null>("");
-    const [items,setItems] = useState<itemsss[]>([{name: "Vacation",date: new Date()},{name: 'Beach Trip',date: new Date("12-12-2020")},{name: "School Diary",date: new Date("07-07-2024")}])
-    const [editing,setEditing] = useState(false);
-    const [addEntry,setEntry] = useState(true);
-    const [entries,setEntries] = useState(["We went to central park","There were alot of rides","Next, we went to the rides","I sat on a roller coaster"])
+    useEffect(()=>{
+        if(activeDiaryID){
+            dispatch(getAllEntries()); 
+            setupdateEntry(false)
+        }
+    },[activeDiaryID,updateEntry,dispatch])
+
+
+    useEffect(()=>{
+        dispatch(getAllDiaries());
+        setupdateDiary(false);
+    },[updateDiary,dispatch])
     
     return (
+        <HomeStyles>
         <div className="cont">
             <div className="list">
+                {!activeDiaryID ?
+                <div className="listitems-cntr"> 
                 <center>
                 <div className="crt-new-btndiv">
-                    <button className="crt-new-btn" 
-                    onClick={
-                        () => 
-                        {
-                        setItems(prv => {return [...prv,{name:"",date: new Date()}]})
-                        setEditing(true) 
-                        }}>
-                Create New
-                </button> 
+                    <button className="crt-new-btn" onClick={ () => setCanEditDiary(!canEditDiary) }>
+                    Create New </button>  
                 </div>
                 
-                {items.map((item,length) => { return <div className="list-item" key={item.name}>
-                   <div className="iconBox">
-                    <center>
-                    <MenuBookIcon fontSize="large"/>
-                    </center>
-                    </div>
-                   <div className="detailBox">
-                    {length == items.length - 1  && editing ? 
-                    <form onSubmit={(e: FormEvent<HTMLFormElement>) => {                        
-                        e.preventDefault() 
-                        
-                        let newObject: itemsss = {name: myRef?.current ?? "",date : new Date()};
-                        let newAry: itemsss[] = items.slice(0,items.length-1)
-                        newAry.push(newObject)
-                        setItems(newAry)
-                        setEditing(false)
-                    }}>
+                <CustomModal open={canEditDiary} close={()=> setCanEditDiary(false)}  textBoxEnabled={false} head="Diary Name"
+                    handleSubmit={(message)=>{ Request.post('fakeapi/diary/',{title: message,type: "private",userId: user?.id}).then(dat=> dispatch(activeDiaryId(dat.diary.id)))
+                    setCanEditDiary(false)
+                    setupdateDiary(true) }}
+                />
+                    
+                {Diaries?.map(item => <DiaryCard item={item} />)}
 
-                    <input className="list-item-title" placeholder="Enter Title" 
-                    onChange={(e) => myRef.current = e.target.value}/>
-                   </form >
-                   :
-                   <div className="list-item-title"><b>{item.name}</b></div>
-                  
-                   
-                   }
-                   <div className="list-item-date">{item.date.getFullYear()} </div>
-                   </div>
-                   <div className="button-list">
-                   <button className="list-btn" id="add">+ Add Entries</button>
-                   <button className="list-btn" id="view">- View Entries</button>
-                   </div>
-
-                </div>
-                })}
                 </center>
+                <div className="bottom-avtr">
+                {logout && <div className="logout-optn" onClick={()=> dispatch(setAuthState(false))}>Logout</div>}
+                <AccountCircleOutlinedIcon className="logoutIcon" fontSize="large" onClick={() => setLogout(!logout)} />             
+                </div>
+                </div>
+                : 
+                <>
+                <div className="btn-cntr">
+                    <div className="backToDiaries" onClick={() => dispatch(activeDiaryId(null))}><ArrowBackIcon fontSize="large"/></div>
+                    <button className="addEntry" onClick={()=> setEntry(true)}>Add Entry</button> 
+                </div>
+                <CustomModal open={addEntry} close={()=> setEntry(false)} textBoxEnabled={true} head="Entry Name" preText=" "
+                    handleSubmit={(message) => {
+                        Request.post(`fakeapi/diary/entry/${activeDiaryID}`,
+                        {title: `Entry${AllEntries.length}`,content: message})
+                        .then((item) => { dispatch(activeEntryId(item.entry.id))})
+                        setEntry(false)
+                        setupdateEntry(true)  }}
+                />
+                {  AllEntries.map((item,length) => <EntryCard item={item} len={length} />) }
+            </>
+            }
             </div>
+            
             <div className="entry">
+                {AllDiaries.length === 0 ? 
+                <div className="entries-cntr">
+                <div className="empty-icon"><FeedbackTwoToneIcon fontSize="large"/></div>
+                <div className="empty-iconText">Select a Diary to view it's entries!</div>
+                </div>
+                :
+                AllEntries.length === 0 && !addEntry?
+                <div>
+                <div className="empty-icon"><QueueOutlinedIcon fontSize="large"
+                onClick = {()=> (setEntry(true))}
+                />
+                </div>
+                <div className="empty-iconText">Start entering entries to show over here!</div>
+                </div>
+                :
                 <div className="entry-box">
                     <div className = "contents">
-                    <ul>
-                        {entries.map(item => <li className="entry-li" key={item}>
-                            {item}
-                            <button className="del-entry">X</button>
-                        </li>)}
-                    </ul> 
+                    <p className="content-cntr">
+                       {AllEntries[activeEntryID]?.content ?? "" } 
+                    </p>
                     </div>
-                    {addEntry ? 
-                    <div className="addEntry">
-                    <button className="addEntrybtn" onClick={()=> setEntry(false)}>Add Entry</button> 
-                    </div>
-                    :
-                    <form onSubmit={(e: FormEvent<HTMLFormElement>)=> {
-                        e.preventDefault()
-                        console.log("WORKEDD");
-                        setEntry(true)
-                        
-                        setEntries(prev => [...prev,myRef.current ? myRef.current : ""])
-                    }}>
-                    <input className="entry-input" placeholder="Enter Text..." onChange={(e)=> myRef.current = e.target.value}/>
-                    </form>
-                    }
-                </div>               
+                </div>
+                }
             </div>
         </div>
+        </HomeStyles>
     )
 }

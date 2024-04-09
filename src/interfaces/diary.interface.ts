@@ -1,4 +1,5 @@
 export interface Diary{
+    title: string,
     id? : string
     createdAt: string
     updatedAt: string

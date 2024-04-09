@@ -1,24 +1,45 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Entry }from '../interfaces/entry.interface';
 
+export const getAllEntries = createAsyncThunk(
+  `EntrySlice/getAllEntries`,
+  async (args,thunkAPI) => { 
+   const diaryID = (thunkAPI.getState() as { diary: { activeDiaryID: string | null } })?.diary?.activeDiaryID;
+   const response = await fetch(`fakeapi/diary/entries/${diaryID}`)
+   return response.json(); 
+   })
+
+const firstState = {
+  entries: [] as Entry[],
+  isLoading: false,
+  error: false,
+  activeEntryID: 0
+
+}
 const entries = createSlice({
   name: 'entries',
-  initialState: [] as Entry[],
+  initialState: firstState,
   reducers: {
-    setEntries(state, { payload }: PayloadAction<Entry[] | null>) {
-      return (state = payload != null ? payload : []);
-    },
-    updateEntry(state, { payload }: PayloadAction<Entry>) {
-      const { id } = payload;
-      console.log("UPDATETTETETET ENTRYYYY");
+    activeEntryId: (state,{payload}: PayloadAction<number>) => {
+      state.activeEntryID = payload;
+     }
+  },
+  extraReducers(builder) {
+    builder
+    .addCase(getAllEntries.pending,(state)=>{
+     return {...state,isLoading:true}
+    })
+    .addCase(getAllEntries.fulfilled,(state,{payload}: PayloadAction<{ entries: Entry[]}>)=>{
       
-      const index = state.findIndex((e) => e.id === id);
-      if (index !== -1) {
-        state.splice(index, 1, payload);
-      }
-    },
+      return {...state,isLoading:false,error:false,entries: payload.entries}
+    })
+    .addCase(getAllEntries.rejected,(state)=>{
+      
+      return {...state,error:true}
+
+    })
   },
 });
 
-export const { setEntries, updateEntry } = entries.actions;
+export const { activeEntryId } = entries.actions;
 export default entries.reducer;

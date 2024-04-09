@@ -14,7 +14,6 @@ export interface AuthResponse {
 
 const signup = (schema: any,req: Request) : AuthResponse | Response => {
     const signInInfo = JSON.parse(req.requestBody);
-    console.log("Getting schema: ",schema," and req: ",req);
     
     const user = schema.users.findBy({username : signInInfo.username});
     if(user){
